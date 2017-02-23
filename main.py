@@ -1,15 +1,7 @@
 from BeautifulSoup import BeautifulSoup
 import urllib2, sys, requests, os, errno
 
-# Used as header to avoid failed request. 
-hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-       'Accept-Encoding': 'none',
-       'Accept-Language': 'en-US,en;q=0.8',
-       'Connection': 'keep-alive'}
-
-
+# Fixed constants
 thread_link_length = 17
 media_format = [".jpg", ".png", ".gif", ".webm"]
 
@@ -30,6 +22,7 @@ class Page(object):
 		return pages
 
 
+
 # Describes one thread
 class Thread(object):
 	def __init__(self, page):
@@ -38,13 +31,15 @@ class Thread(object):
 
 	def get_threads(self):
 		try:
-			req = urllib2.Request(self.page, headers=hdr)
-		except (urllib2.HTTPError, urllib2.URLError, urllib2.HTTPException) as e:
+			#req = urllib2.Request(self.page, headers=hdr)
+			req = requests.get(self.page).content
+		except (requests.exceptions.RequestException, 
+				requests.exceptions.ConnectionError) as e:
 			print "Failed to get threads. Exiting"
 			sys.exit(1)
 
-		html_page = urllib2.urlopen(req)
-		soup = BeautifulSoup(html_page)
+		#html_page = urllib2.urlopen(req)
+		soup = BeautifulSoup(req)
 		threads = list()
 
 		# Get the threads and their names
@@ -93,7 +88,7 @@ class Crawl(object):
 						image_content = requests.get('http://' + src.split('//')[1]).content
 					except (requests.exceptions.RequestException, 
 						    requests.exceptions.ConnectionError) as e:
-						print "Number of requests exceeded. Link is likely to be broken"
+						print "Number of tries exceeded. Link is likely broken"
 						pass
 
 					# Opens file. Need to catch errors if any
@@ -129,7 +124,7 @@ class Crawl(object):
 		try:
 			os.makedirs(path)
 		except OSError as e:
-			if e.errno == errno.EEXIST and os.path.isdir(path):
+			if e.errno != errno.EEXIST and os.path.isdir(path):
 				pass
 			else:
 				raise
