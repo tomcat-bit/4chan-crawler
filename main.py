@@ -37,7 +37,12 @@ class Thread(object):
 
 
 	def get_threads(self):
-		req = urllib2.Request(self.page, headers=hdr)
+		try:
+			req = urllib2.Request(self.page, headers=hdr)
+		except (urllib2.HTTPError, urllib2.URLError, urllib2.HTTPException) as e:
+			print "Failed to get threads. Exiting"
+			sys.exit(1)
+
 		html_page = urllib2.urlopen(req)
 		soup = BeautifulSoup(html_page)
 		threads = list()
@@ -100,7 +105,7 @@ class Crawl(object):
 						pass
 	
 					# An exception was thrown and the file might not exist
-					if f.is_file == True:
+					if os.path.isfile(relative_path_name) == True:
 						f.close()
             
 
@@ -113,7 +118,7 @@ class Crawl(object):
 		for p in pages:
 			thread_list = Thread(p).get_threads()
 			for t in thread_list:
-				print "Thread = " + t
+				print "Current thread: " + t
 				self.make_directory(self.board + '/' + t)
 				self.crawl_thread(t)
 
