@@ -1,2 +1,2 @@
-Specify which board you want to crawl. The script makes subdirectories relative to
-the directory in which the script is run
+Specify which board you want to crawl. Subdirectories are made for each thread and board.
+Use it at your own risk!
