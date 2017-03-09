@@ -1,11 +1,17 @@
-from BeautifulSoup import BeautifulSoup
-import urllib2, sys, requests, os, errno
+#from BeautifulSoup import BeautifulSoup
+#import urllib2, sys, requests, os, errno
+import argparse
 
 # Fixed constants
 thread_link_length = 17
 media_format = [".jpg", ".png", ".gif", ".webm"]
+N_PRODUCERS = 1
+N_CONSUMERS = 4
 
+# not a complete list
+POSSIBLE_BOARDS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'gif', 'h', 'hr']
 
+'''
 # Describes one page
 class Page(object):
 	def __init__(self, board):
@@ -20,7 +26,6 @@ class Page(object):
 			pages.append(s)
 
 		return pages
-
 
 
 # Describes one thread
@@ -52,16 +57,34 @@ class Thread(object):
 				threads.append(str(s))
 
 		return threads
+'''
 
 
+class Crawler(object):
+	def __init__(self, boards, disk_destination):
+		self.boards = boards
+		self.disk_destination = disk_destination
+		self.
 
-class Crawl(object):
-	def __init__(self, board):
-		self.board = board
-		self.base_url = "boards.4chan.org/" + self.board + "/"
+		self.initialize_crawler_threads()
+		#self.base_url = "boards.4chan.org/" + self.boards + "/"
+
+
+	def initialize_crawler_threads(self):
+		print("Initializing worker pool using", int(N_PRODUCERS), "link scrapers" 
+			" and", int(N_CONSUMERS), "downloaders..."
+			)
+
+
+		#for e in boards:
+	#		print(e)
+		
+
+
 
 
 	# Crawls through 'thread' and downloads all the digital content
+	'''
 	def crawl_thread(self, thread):
 		page = str('http://' + self.base_url + thread)
 		
@@ -101,12 +124,13 @@ class Crawl(object):
 	
 					# An exception was thrown and the file might not exist
 					if os.path.isfile(relative_path_name) == True:
-						f.close()
-            
-
+						f.close()     
+	'''
 
 	# Runs the enitre crawler
 	def run(self):
+		pass
+		'''
 		pages = Page(self.board).get_pages()
 		self.make_directory(self.board)
 	
@@ -116,9 +140,10 @@ class Crawl(object):
 				print "Current thread: " + t
 				self.make_directory(self.board + '/' + t)
 				self.crawl_thread(t)
+		'''
 
 
-
+'''
 	# Makes a new directory using 'path' as relative path
 	def make_directory(self, path):
 		try:
@@ -128,10 +153,24 @@ class Crawl(object):
 				pass
 			else:
 				raise
-
-
+'''
 
 if __name__ == "__main__":
-	board = sys.argv[1]
-	cr = Crawl(board)
+	parser = argparse.ArgumentParser(description="Crawles the specified boards and saves the contents to disk.")
+	parser.add_argument('boards', 
+						nargs='+', 
+						help='The boards to crawl. Each token is delimited by a whitespace. Must be a non-empty',
+						choices=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'gif', 'h', 'hr'],
+						type=str)
+	
+	parser.add_argument('--dest', 
+						nargs='?', 
+						help='The absolute file path to which the contents will be saved. Default value is current working directory (.)', 
+						default='.', 
+						type=str)
+	arguments = parser.parse_args()
+
+	#print(arguments)
+
+	cr = Crawler(arguments.boards, arguments.dest)
 	cr.run()
