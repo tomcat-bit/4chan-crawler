@@ -1,5 +1,5 @@
-from BeautifulSoup import BeautifulSoup
-import urllib2, sys, requests, os, errno
+from bs4 import BeautifulSoup
+import sys, requests, os, errno
 
 # Fixed constants
 thread_link_length = 17
@@ -35,7 +35,7 @@ class Thread(object):
 			req = requests.get(self.page).content
 		except (requests.exceptions.RequestException, 
 				requests.exceptions.ConnectionError) as e:
-			print "Failed to get threads. Exiting"
+			print("Failed to get threads. Exiting")
 			sys.exit(1)
 
 		#html_page = urllib2.urlopen(req)
@@ -69,8 +69,8 @@ class Crawl(object):
 			html_page = str(requests.get(page).content)
 		except (requests.exceptions.RequestException, 
 				requests.exceptions.ConnectionError) as e:
-			print e
-			print "No more pages to crawl. Exiting"
+			print(e)
+			print("No more pages to crawl. Exiting")
 			sys.exit(1)
 
 		soup = BeautifulSoup('http://' + html_page)
@@ -88,7 +88,7 @@ class Crawl(object):
 						image_content = requests.get('http://' + src.split('//')[1]).content
 					except (requests.exceptions.RequestException, 
 						    requests.exceptions.ConnectionError) as e:
-						print "Number of tries exceeded. Link is likely broken"
+						print("Number of tries exceeded. Link is likely broken")
 						pass
 
 					# Opens file. Need to catch errors if any
@@ -96,7 +96,7 @@ class Crawl(object):
 						f = open(relative_path_name, 'wb')
 						f.write(image_content)
 					except (OSEerror, IOError) as e:
-						print e
+						print(e)
 						pass
 	
 					# An exception was thrown and the file might not exist
@@ -113,7 +113,7 @@ class Crawl(object):
 		for p in pages:
 			thread_list = Thread(p).get_threads()
 			for t in thread_list:
-				print "Current thread: " + t
+				print("Current thread: ", t)
 				self.make_directory(self.board + '/' + t)
 				self.crawl_thread(t)
 
